@@ -1,0 +1,66 @@
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class QuartoDAO {
+
+    public void salvar(Quarto quarto) {
+        String sql = "INSERT INTO quartos (numero, tipo, disponivel, preco, quantidade_pessoas) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
+            stmt.setInt(1, quarto.getNumero());
+            stmt.setString(2, quarto.getTipo());
+            stmt.setBoolean(3, quarto.isDisponivel());
+            stmt.setDouble(4, quarto.getPrecoPorNoite());
+            stmt.setInt(5, quarto.getQuantidadePessoas());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar quarto: " + e.getMessage());
+        }
+    }
+
+    public List<Quarto> listar() {
+        List<Quarto> lista = new ArrayList<>();
+        String sql = "SELECT * FROM quartos";
+
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int numero = rs.getInt("numero");
+                String tipo = rs.getString("tipo");
+                double preco = rs.getDouble("preco");
+                int qtd = rs.getInt("quantidade_pessoas");
+                boolean disponivel = rs.getBoolean("disponivel");
+                Quarto quarto = tipo.equalsIgnoreCase("Simples") ? new QuartoSimples(numero, preco, qtd) : new QuartoLuxo(numero, preco, qtd);
+                quarto.setDisponivel(disponivel);
+                lista.add(quarto);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar quartos: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public Quarto buscarPorNumero(int numero) {
+        String sql = "SELECT * FROM quartos WHERE numero = ?";
+
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
+            stmt.setInt(1, numero);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String tipo = rs.getString("tipo");
+                double preco = rs.getDouble("preco");
+                int qtd = rs.getInt("quantidade_pessoas");
+                boolean disponivel = rs.getBoolean("disponivel");
+                Quarto quarto = tipo.equalsIgnoreCase("Simples") ? new QuartoSimples(numero, preco, qtd) : new QuartoLuxo(numero, preco, qtd);
+                quarto.setDisponivel(disponivel);
+                return quarto;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar quarto: " + e.getMessage());
+        }
+        return null;
+    }
+}
