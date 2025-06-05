@@ -1,9 +1,11 @@
+package control;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexaoBanco {
-    private static final String URL = "jdbc:sqlite:/Users/HOME/Documents/Java/verizon-hotels/data/banco_hotel.db";
+    private static final String URL = "jdbc:sqlite:/Users/HOME/Documentos Sem Icloud/Java/verizon-hotels/data/banco_hotel.db";
 
     public static Connection getConnection() {
         try {

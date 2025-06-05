@@ -1,3 +1,10 @@
+package control.dao;
+
+import control.ConexaoBanco;
+import model.Hospede;
+import model.Quarto;
+import model.Reserva;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,7 +73,7 @@ public class ReservaDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar reservas do Hospede: " + e.getMessage());
+            throw new RuntimeException("Erro ao listar reservas do model.Hospede: " + e.getMessage());
         }
 
         return lista;

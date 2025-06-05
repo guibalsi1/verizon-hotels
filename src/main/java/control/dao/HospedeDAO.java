@@ -1,3 +1,9 @@
+package control.dao;
+
+import control.ConexaoBanco;
+import model.Hospede;
+import model.Reserva;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -5,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HospedeDAO {
+    /**
+     * Este metodo salva um hopede no banco de dados sqlite
+     * @param hospede hopede indica o hospede do quarto em questao
+     */
     public void salvar(Hospede hospede) {
         String sql = "INSERT INTO hospedes (cpf, nome, telefone) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){

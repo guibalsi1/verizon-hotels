@@ -1,3 +1,5 @@
+package model;
+
 public interface Quarto {
         int getNumero();
         boolean isDisponivel();

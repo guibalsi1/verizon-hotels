@@ -1,5 +1,8 @@
+package model;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Reserva {
     private Hospede hospede;
@@ -7,6 +10,7 @@ public class Reserva {
     private LocalDate checkIn;
     private LocalDate checkOut;
     private List<ServicoExtra> servicosExtras;
+    private List<Hospede> participantes;
 
     public Hospede getHospede() {
         return hospede;
@@ -29,5 +33,12 @@ public class Reserva {
         this.quarto = quarto;
         this.checkIn = LocalDate.parse(dataEntrada);
         this.checkOut = LocalDate.parse(dataSaida);
+        this.participantes = new ArrayList<>();
+    }
+
+    public void adicionarParticipante(Hospede participante) {
+        if (!participantes.contains(participante)) {
+            participantes.add(participante);
+        }
     }
 }

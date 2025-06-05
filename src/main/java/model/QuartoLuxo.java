@@ -1,10 +1,12 @@
-public class QuartoSimples implements Quarto {
+package model;
+
+public class QuartoLuxo implements Quarto {
     private int numero;
     private boolean disponivel;
     private double precoPorNoite;
     private int quantidadePessoas;
 
-    public QuartoSimples(int numero, double precoPorNoite, int quantidadePessoas) {
+    public QuartoLuxo(int numero, double precoPorNoite, int quantidadePessoas) {
         this.numero = numero;
         this.precoPorNoite = precoPorNoite;
         this.quantidadePessoas = quantidadePessoas;
@@ -38,6 +40,6 @@ public class QuartoSimples implements Quarto {
 
     @Override
     public String getTipo() {
-        return "Simples";
+        return "Luxo";
     }
 }

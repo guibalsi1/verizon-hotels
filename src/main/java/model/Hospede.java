@@ -1,7 +1,11 @@
+package model;
+
+import model.exceptions.ReservaInvalidaException;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hospede extends Pessoa{
+public class Hospede extends Pessoa {
     private String telefone;
     private List<Reserva> reservas;
 

@@ -1,3 +1,10 @@
+package control.dao;
+
+import control.ConexaoBanco;
+import model.Quarto;
+import model.QuartoLuxo;
+import model.QuartoSimples;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +24,20 @@ public class QuartoDAO {
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar quarto: " + e.getMessage());
+        }
+    }
+
+    public void atualizar(Quarto quarto) {
+        String sql = "UPDATE quartos SET tipo = ?, disponivel = ?, preco = ?, quantidade_pessoas = ? WHERE numero = ?";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, quarto.getTipo());
+            stmt.setBoolean(2, quarto.isDisponivel());
+            stmt.setDouble(3, quarto.getPrecoPorNoite());
+            stmt.setInt(4, quarto.getQuantidadePessoas());
+            stmt.setInt(5, quarto.getNumero());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar quarto: " + e.getMessage());
         }
     }
 
