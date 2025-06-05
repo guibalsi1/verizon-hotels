@@ -1,11 +1,23 @@
 package control;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexaoBanco {
-    private static final String URL = "jdbc:sqlite:/Users/HOME/Documentos Sem Icloud/Java/verizon-hotels/data/banco_hotel.db";
+
+    private static String appDir() {
+        try {
+            return new File(
+                    ConexaoBanco.class.getProtectionDomain().getCodeSource().
+                            getLocation().toURI()).getParentFile().getParent();
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    private static final String URL = "jdbc:sqlite:"+ConexaoBanco.appDir()+"/data/banco_hotel.db";
 
     public static Connection getConnection() {
         try {

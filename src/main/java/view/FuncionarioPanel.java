@@ -1,9 +1,12 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import control.dao.FuncionarioDAO;
+import model.Funcionario;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class FuncionarioPanel {
     private static final String ICON_BUSCAR = "icons/Search.png";
@@ -58,18 +61,16 @@ public class FuncionarioPanel {
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        //FuncionarioDAO funcionarioDAO = new FuncionarioDAO();
-        //List<Funcionario> funcionarios = funcionarioDAO.listar();
+        FuncionarioDAO funcionarioDAO = new FuncionarioDAO();
+        List<Funcionario> funcionarios = funcionarioDAO.listar();
 
-        /*
-        for (Funcionarios funcionario : funcionarios) {
-            JPanel card createFuncionarioCard(funcionario);
+        for (Funcionario funcionario : funcionarios) {
+            JPanel card = createFuncionarioCard(funcionario);
             cardsPanel.add(card);
         }
 
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
-         */
 
         JPanel addWorkerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0,0));
         addWorkerPanel.setOpaque(false);
@@ -85,23 +86,21 @@ public class FuncionarioPanel {
         plusButton.putClientProperty(FlatClientProperties.STYLE, "background: #D5BC00; foreground: #1E1E1E; arc: 999");
         plusButton.setOpaque(true);
 
-        /*
         plusButton.addActionListener( e -> {
             AddWorkerDialog dialog = new AddWorkerDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
             dialog.setVisible(true);
 
-            if (dialog.isWorkAdded()) {
+            if (dialog.isWorkerAdded()) {
                 cardsPanel.removeAll();
                 List<Funcionario> funcionariosAtual = funcionarioDAO.listar();
                 for (Funcionario funcionario : funcionariosAtual) {
                     JPanel card = createFuncionarioCard(funcionario);
                     cardsPanel.add(card);
                 }
-                cardsPanel.revalidate()
+                cardsPanel.revalidate();
                 cardsPanel.repaint();
             }
         });
-         */
 
         addWorkerComponentPanel.add(addWorkerLabel);
         addWorkerComponentPanel.add(plusButton);
@@ -110,5 +109,30 @@ public class FuncionarioPanel {
         contentPanel.add(addWorkerPanel, BorderLayout.SOUTH);
 
         return contentPanel;
+    }
+    private static JPanel createFuncionarioCard(Funcionario funcionario) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
+        card.setPreferredSize(new Dimension(250, 150));
+        card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        JLabel nomeLabel = new JLabel(funcionario.getNome());
+        nomeLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2");
+        nomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel cpfLabel = new JLabel("CPF: " + funcionario.getCpf());
+        cpfLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel cargoLabel = new JLabel("Cargo: " + funcionario.getCargo());
+        cargoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        card.add(nomeLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
+        card.add(cpfLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
+        card.add(cargoLabel);
+
+        return card;
     }
 }

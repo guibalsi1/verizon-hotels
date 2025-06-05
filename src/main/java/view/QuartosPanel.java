@@ -1,12 +1,18 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import control.dao.QuartoDAO;
+import model.Quarto;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Objects;
 
 public class QuartosPanel {
     private static final String ICON_BUSCAR = "icons/Search.png";
+    private static final String ICON_SIMPLES = "icons/Dollar.png";
+    private static final String ICON_LUXO = "icons/Star.png";
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
@@ -15,13 +21,13 @@ public class QuartosPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Quartos");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE_CLASS, "title-label");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold+2");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel searchBarPanel = new JPanel(new BorderLayout(8, 0));
         searchBarPanel.setOpaque(false);
         JTextField searchField = new JTextField();
-        searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Busca por número do quarto..");
+        searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Busca por Numero do Quarto...");
 
         JButton searchButton;
         ImageIcon searchIconPng = null;
@@ -48,40 +54,74 @@ public class QuartosPanel {
 
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
-        JPanel cardsPanel = new JPanel(new GridLayout(2, 2, 20, 20));
+        JPanel cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 20, 20));
         cardsPanel.setOpaque(false);
-        cardsPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 25, 0));
+        cardsPanel.setBorder(BorderFactory.createEmptyBorder(20,0,25,0));
 
-        for (int i = 0; i < 4; i++) {
-            JPanel card = new JPanel();
-            card.putClientProperty(FlatClientProperties.STYLE, "background: #FF0000; arc: 15");
-            card.setPreferredSize(new Dimension(200, 150));
+        JScrollPane scrollPane = new JScrollPane(cardsPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        QuartoDAO quartoDAO = new QuartoDAO();
+        List<Quarto> quartos = quartoDAO.listar();
+
+        for (Quarto quarto : quartos) {
+            JPanel card = createQuartoCard(quarto);
             cardsPanel.add(card);
         }
-        contentPanel.add(cardsPanel, BorderLayout.CENTER);
 
-        JPanel addGuestOuterPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        addGuestOuterPanel.setOpaque(false);
-        addGuestOuterPanel.setBorder(BorderFactory.createEmptyBorder(0,0,5,0));
-
-        JPanel addGuestComponentsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)); // Sem espaçamento interno
-        addGuestComponentsPanel.setOpaque(false);
-
-
-        JLabel addGuestLabel = new JLabel("Adicionar novo Hóspede ");
-        addGuestLabel.setOpaque(true);
-
-
-        JButton plusButton = new JButton("+");
-        plusButton.putClientProperty(FlatClientProperties.STYLE, "background: #FF0000; foreground: #FFFFFF; arc: 15");
-        plusButton.setOpaque(true);
-
-        addGuestComponentsPanel.add(addGuestLabel);
-        addGuestComponentsPanel.add(plusButton);
-
-        addGuestOuterPanel.add(addGuestComponentsPanel);
-        contentPanel.add(addGuestOuterPanel, BorderLayout.SOUTH);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         return contentPanel;
+    }
+    private static JPanel createQuartoCard(Quarto quarto) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setPreferredSize(new Dimension(250, 150));
+        card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        ImageIcon iconPng = null;
+        if (quarto.getTipo().equals("Simples")) {
+            iconPng = new ImageIcon(Objects.requireNonNull(QuartosPanel.class.getClassLoader().getResource(ICON_SIMPLES)));
+            Image scaledImg = iconPng.getImage().getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+            iconPng = new ImageIcon(scaledImg);
+        }
+        else if (quarto.getTipo().equals("Luxo")) {
+            iconPng = new ImageIcon(Objects.requireNonNull(QuartosPanel.class.getClassLoader().getResource(ICON_LUXO)));
+            Image scaledImg = iconPng.getImage().getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+            iconPng = new ImageIcon(scaledImg);
+        }
+
+        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        iconPanel.setOpaque(false);
+        iconPanel.add(new JLabel(iconPng));
+        card.add(iconPanel);
+
+        JLabel quartoLabel = new JLabel(String.valueOf(quarto.getNumero()));
+        quartoLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2");
+        quartoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel tipoLabel = new JLabel("Tipo: " + quarto.getTipo());
+        tipoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel precoLabel = new JLabel(String.format("Preço por noite: R$ %.2f", quarto.getPrecoPorNoite()));
+        precoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+
+        if(quarto.isDisponivel()){
+            card.putClientProperty(FlatClientProperties.STYLE, "background: #AEFF9A; foreground: #1E1E1E; arc: 15;");
+        }
+        else {
+            card.putClientProperty(FlatClientProperties.STYLE, "background: #FF7777; foreground: #1E1E1E; arc: 15;");
+        }
+        card.add(quartoLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
+        card.add(tipoLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
+        card.add(precoLabel);
+
+        return card;
     }
 }

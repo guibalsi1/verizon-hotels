@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Reserva {
+    private int id;
     private Hospede hospede;
     private Quarto quarto;
     private LocalDate checkIn;
@@ -12,8 +13,16 @@ public class Reserva {
     private List<ServicoExtra> servicosExtras;
     private List<Hospede> participantes;
 
+    public int getId() {
+        return id;
+    }
+
     public Hospede getHospede() {
         return hospede;
+    }
+
+    public List<Hospede> getParticipantes() {
+        return participantes;
     }
 
     public Quarto getQuarto() {
@@ -28,7 +37,8 @@ public class Reserva {
         return checkOut.toString();
     }
 
-    public Reserva(Hospede hospede, Quarto quarto, String dataEntrada, String dataSaida) {
+    public Reserva(int id, Hospede hospede, Quarto quarto, String dataEntrada, String dataSaida) {
+        this.id = id;
         this.hospede = hospede;
         this.quarto = quarto;
         this.checkIn = LocalDate.parse(dataEntrada);

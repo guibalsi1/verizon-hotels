@@ -1,9 +1,14 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import control.dao.ReservaDAO;
+import control.dao.QuartoDAO;
+import control.dao.HospedeDAO;
+import model.Reserva;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class ReservasPanel {
     private static final String ICON_BUSCAR = "icons/Search.png";
@@ -48,17 +53,29 @@ public class ReservasPanel {
 
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
-        JPanel cardsPanel = new JPanel(new GridLayout(2, 2, 20, 20));
+        // Painel de cards com ScrollPane
+        JPanel cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 20, 20));
         cardsPanel.setOpaque(false);
-        cardsPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 25, 0));
+        cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 
-        for (int i = 0; i < 4; i++) {
-            JPanel card = new JPanel();
-            card.putClientProperty(FlatClientProperties.STYLE, "background: #FF0000; arc: 15");
-            card.setPreferredSize(new Dimension(200, 150));
+        // Adiciona ScrollPane
+        JScrollPane scrollPane = new JScrollPane(cardsPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+
+        HospedeDAO hospedeDAO = new HospedeDAO();
+        QuartoDAO quartoDAO = new QuartoDAO();
+        ReservaDAO reservaDAO = new ReservaDAO();
+        List<Reserva> reservas = reservaDAO.listarTodas(hospedeDAO, quartoDAO);
+
+        // Cria cards para cada hóspede
+        for (Reserva reserva: reservas) {
+            JPanel card = createReservaCard(reserva);
             cardsPanel.add(card);
         }
-        contentPanel.add(cardsPanel, BorderLayout.CENTER);
 
         JPanel addGuestOuterPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         addGuestOuterPanel.setOpaque(false);
@@ -68,13 +85,30 @@ public class ReservasPanel {
         addGuestComponentsPanel.setOpaque(false);
 
 
-        JLabel addGuestLabel = new JLabel("Adicionar novo Hóspede ");
+        JLabel addGuestLabel = new JLabel("Adicionar nova Reserva ");
         addGuestLabel.setOpaque(true);
 
 
         JButton plusButton = new JButton("+");
         plusButton.putClientProperty(FlatClientProperties.STYLE, "background: #FF0000; foreground: #FFFFFF; arc: 15");
         plusButton.setOpaque(true);
+
+        plusButton.addActionListener(e -> {
+            AddGuestDialog dialog = new AddGuestDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
+            dialog.setVisible(true);
+
+            // Se um novo hóspede foi adicionado, atualiza a lista
+            if (dialog.isHospedeAdicionado()) {
+                cardsPanel.removeAll();
+                List<Reserva> reservasAtual = reservaDAO.listarTodas(hospedeDAO,quartoDAO);
+                for (Reserva reserva : reservasAtual) {
+                    JPanel card = createReservaCard(reserva);
+                    cardsPanel.add(card);
+                }
+                cardsPanel.revalidate();
+                cardsPanel.repaint();
+            }
+        });
 
         addGuestComponentsPanel.add(addGuestLabel);
         addGuestComponentsPanel.add(plusButton);
@@ -83,5 +117,62 @@ public class ReservasPanel {
         contentPanel.add(addGuestOuterPanel, BorderLayout.SOUTH);
 
         return contentPanel;
+    }
+
+
+    private static JPanel createReservaCard(Reserva reserva) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
+        card.setPreferredSize(new Dimension(300, 220));
+        card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        // Responsável
+        JLabel responsavelLabel = new JLabel("Responsável: " + reserva.getHospede().getNome());
+        responsavelLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2");
+        responsavelLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Quarto
+        JLabel quartoLabel = new JLabel("Quarto: " + reserva.getQuarto().getNumero() + " (" + reserva.getQuarto().getTipo() + ")");
+        quartoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Período
+        JLabel periodoLabel = new JLabel("Período: " + reserva.getDataEntrada() + " a " + reserva.getDataSaida());
+        periodoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Participantes
+        JLabel participantesLabel = new JLabel("Participantes:");
+        participantesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel participantesPanel = new JPanel();
+        participantesPanel.setLayout(new BoxLayout(participantesPanel, BoxLayout.Y_AXIS));
+        participantesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        participantesPanel.setOpaque(false);
+
+        for (model.Hospede h : reserva.getParticipantes()) {
+            JLabel nome = new JLabel("- " + h.getNome());
+            nome.setAlignmentX(Component.LEFT_ALIGNMENT);
+            participantesPanel.add(nome);
+        }
+
+        // Botão "Gerar Fatura" (a ação será implementada futuramente)
+        JButton btnFatura = new JButton("Gerar Fatura");
+        btnFatura.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnFatura.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+
+        // Montagem final
+        card.add(responsavelLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 8)));
+        card.add(quartoLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
+        card.add(periodoLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 8)));
+        card.add(participantesLabel);
+        card.add(participantesPanel);
+        card.add(Box.createVerticalGlue());
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
+        card.add(btnFatura);
+
+        return card;
     }
 }

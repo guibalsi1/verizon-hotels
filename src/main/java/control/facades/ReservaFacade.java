@@ -7,7 +7,6 @@ import model.Quarto;
 import model.Reserva;
 import model.exceptions.ReservaInvalidaException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReservaFacade {
@@ -21,8 +20,9 @@ public class ReservaFacade {
         this.quartoDAO = quartoDAO;
     }
 
-    public Reserva criarReserva(String cpfResponsavel, int numeroQuarto, String dataEntrada, String dataSaida, List<String> cpfsParticipantes) throws ReservaInvalidaException {
+    public Reserva criarReserva(int id, String cpfResponsavel, int numeroQuarto, String dataEntrada, String dataSaida, List<String> cpfsParticipantes) throws ReservaInvalidaException {
         try {
+
             // Buscar o hóspede responsável
             Hospede responsavel = hospedeDAO.buscarPorCPF(cpfResponsavel, quartoDAO, reservaDAO);
             if (responsavel == null) {
@@ -36,7 +36,7 @@ public class ReservaFacade {
             }
 
             // Criar a reserva
-            Reserva reserva = new Reserva(responsavel, quarto, dataEntrada, dataSaida);
+            Reserva reserva = new Reserva(id,responsavel, quarto, dataEntrada, dataSaida);
 
             // Adicionar o responsável como participante
             reserva.adicionarParticipante(responsavel);

@@ -92,7 +92,7 @@ public class HospedesPanel extends JPanel {
         
         // Adiciona ação ao botão
         plusButton.addActionListener(e -> {
-            AdicionarHospedeDialog dialog = new AdicionarHospedeDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
+            AddGuestDialog dialog = new AddGuestDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
             dialog.setVisible(true);
             
             // Se um novo hóspede foi adicionado, atualiza a lista
@@ -144,56 +144,5 @@ public class HospedesPanel extends JPanel {
         card.add(telefoneLabel);
 
         return card;
-    }
-}
-
-// Classe WrapLayout para melhor organização dos cards
-class WrapLayout extends FlowLayout {
-    public WrapLayout(int align, int hgap, int vgap) {
-        super(align, hgap, vgap);
-    }
-
-    @Override
-    public Dimension preferredLayoutSize(Container target) {
-        return layoutSize(target, true);
-    }
-
-    @Override
-    public Dimension minimumLayoutSize(Container target) {
-        return layoutSize(target, false);
-    }
-
-    private Dimension layoutSize(Container target, boolean preferred) {
-        synchronized (target.getTreeLock()) {
-            int targetWidth = target.getWidth();
-            if (targetWidth == 0) {
-                targetWidth = Integer.MAX_VALUE;
-            }
-
-            int hgap = getHgap();
-            int vgap = getVgap();
-            Insets insets = target.getInsets();
-            int maxWidth = targetWidth - (insets.left + insets.right + hgap * 2);
-            int x = insets.left + hgap;
-            int y = insets.top + vgap;
-            int rowHeight = 0;
-
-            int nmembers = target.getComponentCount();
-            for (int i = 0; i < nmembers; i++) {
-                Component m = target.getComponent(i);
-                if (m.isVisible()) {
-                    Dimension d = preferred ? m.getPreferredSize() : m.getMinimumSize();
-                    if (x + d.width > maxWidth) {
-                        x = insets.left + hgap;
-                        y += vgap + rowHeight;
-                        rowHeight = 0;
-                    }
-                    x += d.width + hgap;
-                    rowHeight = Math.max(rowHeight, d.height);
-                }
-            }
-            y += rowHeight + vgap;
-            return new Dimension(targetWidth, y + insets.bottom);
-        }
     }
 }
