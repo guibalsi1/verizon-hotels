@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class NavPanel extends JPanel {
     private static final String ICON_HOSPEDES = "icons/Users.png";
@@ -13,12 +14,24 @@ public class NavPanel extends JPanel {
     private static final String ICON_SERVICOS = "icons/Star.png";
     private static final String ICON_RELATORIOS = "icons/Table.png";
     private static final String ICON_CONFIGURACOES = "icons/Settings.png";
+    private static final String ICON_LOGO = "icons/Logo.png";
 
     public static JPanel createNavigationPanel(JPanel contentPanel) {
         JPanel navPanel = new JPanel();
         navPanel.setName("navigationPanel");
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
         navPanel.setPreferredSize(new Dimension(240, 0));
+        navPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
+        ImageIcon logoIcon = null;
+        logoIcon = new ImageIcon(Objects.requireNonNull(NavPanel.class.getClassLoader().getResource(ICON_LOGO)));
+        Image scaledImg = logoIcon.getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(scaledImg);
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        logoPanel.setMaximumSize(new Dimension( Integer.MAX_VALUE, 100));
+        logoPanel.setOpaque(false);
+        logoPanel.add(new JLabel(logoIcon));
+        navPanel.add(logoPanel);
 
         String[] navText = {
                 "Hóspedes", "Funcionários", "Quartos", "Reservas",

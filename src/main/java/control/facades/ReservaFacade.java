@@ -24,7 +24,7 @@ public class ReservaFacade {
         try {
 
             // Buscar o hóspede responsável
-            Hospede responsavel = hospedeDAO.buscarPorCPF(cpfResponsavel, quartoDAO, reservaDAO);
+            Hospede responsavel = hospedeDAO.buscarPorCPF(cpfResponsavel);
             if (responsavel == null) {
                 throw new ReservaInvalidaException("Responsável não encontrado: " + cpfResponsavel);
             }
@@ -44,7 +44,7 @@ public class ReservaFacade {
             // Buscar e adicionar os demais participantes
             for (String cpf : cpfsParticipantes) {
                 if (cpf.equals(cpfResponsavel)) continue; // já adicionado
-                Hospede participante = hospedeDAO.buscarPorCPF(cpf, quartoDAO, reservaDAO);
+                Hospede participante = hospedeDAO.buscarPorCPF(cpf);
                 if (participante != null) {
                     reserva.adicionarParticipante(participante);
                 } else {

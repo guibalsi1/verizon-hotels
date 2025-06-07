@@ -54,11 +54,18 @@ public class QuartosPanel {
 
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
-        JPanel cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 20, 20));
+        JPanel cardsPanel = new JPanel();
+        cardsPanel.setLayout(new GridLayout(0, 2, 20, 20)); // 2 colunas, espaçamento de 20px
         cardsPanel.setOpaque(false);
-        cardsPanel.setBorder(BorderFactory.createEmptyBorder(20,0,25,0));
+        cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 
-        JScrollPane scrollPane = new JScrollPane(cardsPanel);
+        // Crie um panel wrapper para centralizar os cards
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setOpaque(false);
+        wrapperPanel.add(cardsPanel, BorderLayout.NORTH);
+
+        // Use o wrapperPanel no scrollPane ao invés do cardsPanel diretamente
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
@@ -79,7 +86,8 @@ public class QuartosPanel {
     private static JPanel createQuartoCard(Quarto quarto) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setPreferredSize(new Dimension(250, 150));
+        card.setPreferredSize(new Dimension(300, 150));
+        card.setMaximumSize(new Dimension(300, 150));
         card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
         ImageIcon iconPng = null;

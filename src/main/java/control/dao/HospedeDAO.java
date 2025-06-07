@@ -44,22 +44,17 @@ public class HospedeDAO {
         return lista;
     }
 
-    public Hospede buscarPorCPF(String cpf, QuartoDAO quartoDAO, ReservaDAO reservaDAO) {
+    public Hospede buscarPorCPF(String cpf) {
         String sql = "SELECT * FROM hospedes WHERE cpf = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
             stmt.setString(1, cpf);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                Hospede h = new Hospede(
-                        rs.getString("cpf"),
-                        rs.getString("nome"),
-                        rs.getString("telefone")
+                return new Hospede(
+                    rs.getString("cpf"),
+                    rs.getString("nome"),
+                    rs.getString("telefone")
                 );
-
-                List<Reserva> reservas = reservaDAO.listarPorHospede(cpf, quartoDAO, h);
-                h.setReservas(reservas);
-
-                return h;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar hospede por CPF: " + e.getMessage());

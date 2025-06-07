@@ -1,22 +1,22 @@
-package view;
+package view.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import control.dao.HospedeDAO;
-import model.Hospede;
+import control.dao.FuncionarioDAO;
+import model.Funcionario;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 
-public class AddGuestDialog extends JDialog {
+public class AddWorkerDialog extends JDialog {
     private JTextField nomeField;
     private JFormattedTextField cpfField;
-    private JFormattedTextField telefoneField;
-    private boolean hospedeAdicionado = false;
+    private JTextField cargoField;
+    private boolean funcionarioAdicionado = false;
 
-    public AddGuestDialog(Frame owner) {
-        super(owner, "Adicionar Novo Hóspede", true);
+    public AddWorkerDialog(Frame owner) {
+        super(owner, "Adicionar Novo Funcionário", true);
         initComponents();
     }
 
@@ -55,20 +55,14 @@ public class AddGuestDialog extends JDialog {
         }
         mainPanel.add(cpfField, gbc);
 
-        // Telefone
         gbc.gridx = 0;
         gbc.gridy = 2;
-        mainPanel.add(new JLabel("Telefone:"), gbc);
+        mainPanel.add(new JLabel("Cargo:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        try {
-            javax.swing.text.MaskFormatter telMask = new javax.swing.text.MaskFormatter("(##) #####-####");
-            telefoneField = new JFormattedTextField(telMask);
-        } catch (ParseException e) {
-            telefoneField = new JFormattedTextField();
-        }
-        mainPanel.add(telefoneField, gbc);
+        cargoField = new JTextField(20); // Inicialização do campo
+        mainPanel.add(cargoField, gbc);
 
         // Painel de botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -84,7 +78,7 @@ public class AddGuestDialog extends JDialog {
         // Ação do botão Salvar
         salvarButton.addActionListener((ActionEvent e) -> {
             if (validarCampos()) {
-                salvarHospede();
+                salvarFuncionario();
             }
         });
 
@@ -116,9 +110,8 @@ public class AddGuestDialog extends JDialog {
             return false;
         }
 
-        String telefone = telefoneField.getText().replaceAll("[^0-9]", "");
-        if (telefone.length() < 10) {
-            JOptionPane.showMessageDialog(this, "Por favor, preencha o telefone corretamente.",
+        if (cargoField.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, preencha o cargo.",
                     "Campo obrigatório", JOptionPane.WARNING_MESSAGE);
             return false;
         }
@@ -126,27 +119,27 @@ public class AddGuestDialog extends JDialog {
         return true;
     }
 
-    private void salvarHospede() {
+    private void salvarFuncionario() {
         try {
             String nome = nomeField.getText().trim();
             String cpf = cpfField.getText().replaceAll("[^0-9]", "");
-            String telefone = telefoneField.getText().replaceAll("[^0-9]", "");
+            String cargo = cargoField.getText().trim();
 
-            Hospede novoHospede = new Hospede(cpf, nome, telefone);
-            HospedeDAO hospedeDAO = new HospedeDAO();
-            hospedeDAO.salvar(novoHospede);
+            Funcionario novoFuncionario = new Funcionario(cpf, nome, cargo);
+            FuncionarioDAO funcionarioDAO = new FuncionarioDAO();
+            funcionarioDAO.salvar(novoFuncionario);
 
-            hospedeAdicionado = true;
-            JOptionPane.showMessageDialog(this, "Hóspede adicionado com sucesso!",
+            funcionarioAdicionado = true;
+            JOptionPane.showMessageDialog(this, "Funcionário adicionado com sucesso!",
                     "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar hóspede: " + e.getMessage(),
+            JOptionPane.showMessageDialog(this, "Erro ao salvar Funcionário: " + e.getMessage(),
                     "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public boolean isHospedeAdicionado() {
-        return hospedeAdicionado;
+    public boolean isWorkerAdded() {
+        return funcionarioAdicionado;
     }
 }

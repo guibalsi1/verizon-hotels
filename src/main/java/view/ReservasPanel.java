@@ -5,6 +5,7 @@ import control.dao.ReservaDAO;
 import control.dao.QuartoDAO;
 import control.dao.HospedeDAO;
 import model.Reserva;
+import view.dialogs.AddBookingDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +55,9 @@ public class ReservasPanel {
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
         // Painel de cards com ScrollPane
-        JPanel cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 20, 20));
+        // Substitua a criação do cardsPanel por:
+        JPanel cardsPanel = new JPanel();
+        cardsPanel.setLayout(new BoxLayout(cardsPanel, BoxLayout.Y_AXIS));
         cardsPanel.setOpaque(false);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 
@@ -65,13 +68,15 @@ public class ReservasPanel {
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
+        // Adiciona o scrollPane ao contentPanel (adicione esta linha)
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         HospedeDAO hospedeDAO = new HospedeDAO();
         QuartoDAO quartoDAO = new QuartoDAO();
         ReservaDAO reservaDAO = new ReservaDAO();
         List<Reserva> reservas = reservaDAO.listarTodas(hospedeDAO, quartoDAO);
 
-        // Cria cards para cada hóspede
+        // Cria cards para cada reserva
         for (Reserva reserva: reservas) {
             JPanel card = createReservaCard(reserva);
             cardsPanel.add(card);
@@ -90,15 +95,14 @@ public class ReservasPanel {
 
 
         JButton plusButton = new JButton("+");
-        plusButton.putClientProperty(FlatClientProperties.STYLE, "background: #FF0000; foreground: #FFFFFF; arc: 15");
+        plusButton.putClientProperty(FlatClientProperties.STYLE, "background: #D5BC00; foreground: #1E1E1E; arc: 999");
         plusButton.setOpaque(true);
 
         plusButton.addActionListener(e -> {
-            AddGuestDialog dialog = new AddGuestDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
+            AddBookingDialog dialog = new AddBookingDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
             dialog.setVisible(true);
 
-            // Se um novo hóspede foi adicionado, atualiza a lista
-            if (dialog.isHospedeAdicionado()) {
+            if (dialog.isReservaAdicionada()) {
                 cardsPanel.removeAll();
                 List<Reserva> reservasAtual = reservaDAO.listarTodas(hospedeDAO,quartoDAO);
                 for (Reserva reserva : reservasAtual) {
@@ -124,8 +128,14 @@ public class ReservasPanel {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
-        card.setPreferredSize(new Dimension(300, 220));
-        card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        // Ajusta a largura para ocupar todo o espaço horizontal e altura fixa
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        card.setPreferredSize(new Dimension(Integer.MAX_VALUE, 200));
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 20, 0), // Espaçamento entre cards
+                BorderFactory.createEmptyBorder(10, 15, 10, 15) // Padding interno do card
+        ));
+
 
         // Responsável
         JLabel responsavelLabel = new JLabel("Responsável: " + reserva.getHospede().getNome());

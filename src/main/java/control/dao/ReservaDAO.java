@@ -14,14 +14,19 @@ import java.util.List;
 public class ReservaDAO {
 
     public void salvar(Reserva r) {
-        String sql = "INSERT INTO reservas (id, cpf_hospede, numero_quarto, data_entrada, data_saida) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
-            stmt.setInt(1, r.getId());
-            stmt.setString(2, r.getHospede().getCpf());
-            stmt.setInt(3, r.getQuarto().getNumero());
-            stmt.setString(4, r.getDataEntrada());
-            stmt.setString(5, r.getDataSaida());
+        String sql = "INSERT INTO reservas (cpf_hospede, numero_quarto, data_entrada, data_saida) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, r.getHospede().getCpf());
+            stmt.setInt(2, r.getQuarto().getNumero());
+            stmt.setString(3, r.getDataEntrada());
+            stmt.setString(4, r.getDataSaida());
             stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    r.setId(generatedKeys.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar reserva: " + e.getMessage());
         }
@@ -41,9 +46,8 @@ public class ReservaDAO {
                 String entrada = rs.getString("data_entrada");
                 String saida = rs.getString("data_saida");
 
-                Hospede h = hospedeDAO.buscarPorCPF(cpf, quartoDAO, null);
+                Hospede h = hospedeDAO.buscarPorCPF(cpf);
                 Quarto q = quartoDAO.buscarPorNumero(numero);
-
 
                 if (h != null && q != null) {
                     Reserva r = new Reserva(id, h, q, entrada, saida);
@@ -55,6 +59,7 @@ public class ReservaDAO {
         }
         return lista;
     }
+
 
     public List<Reserva> listarPorHospede(String cpfHospede, QuartoDAO quartoDAO, Hospede hospede) {
         List<Reserva> lista = new ArrayList<>();

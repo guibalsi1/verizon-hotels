@@ -17,6 +17,10 @@ public class Reserva {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Hospede getHospede() {
         return hospede;
     }
@@ -39,6 +43,14 @@ public class Reserva {
 
     public Reserva(int id, Hospede hospede, Quarto quarto, String dataEntrada, String dataSaida) {
         this.id = id;
+        this.hospede = hospede;
+        this.quarto = quarto;
+        this.checkIn = LocalDate.parse(dataEntrada);
+        this.checkOut = LocalDate.parse(dataSaida);
+        this.participantes = new ArrayList<>();
+    }
+
+    public Reserva(Hospede hospede, Quarto quarto, String dataEntrada, String dataSaida) {
         this.hospede = hospede;
         this.quarto = quarto;
         this.checkIn = LocalDate.parse(dataEntrada);
