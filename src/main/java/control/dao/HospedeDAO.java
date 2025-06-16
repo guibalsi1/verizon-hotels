@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HospedeDAO {
-    /**
-     * Este metodo salva um hopede no banco de dados sqlite
-     * @param hospede hopede indica o hospede do quarto em questao
-     */
+
     public void salvar(Hospede hospede) {
         String sql = "INSERT INTO hospedes (cpf, nome, telefone) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
@@ -60,5 +57,16 @@ public class HospedeDAO {
             throw new RuntimeException("Erro ao buscar hospede por CPF: " + e.getMessage());
         }
         return null;
+    }
+
+    public boolean deletar(String cpf) {
+        String sql = "DELETE FROM hospedes WHERE cpf = ?";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, cpf);
+            int linhasAfetadas = stmt.executeUpdate();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar hóspede: " + e.getMessage());
+        }
     }
 }

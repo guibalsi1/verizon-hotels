@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ServicosPanel {
-    private static final String ICON_BUSCAR = "icons/Search.png";
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
@@ -15,9 +14,9 @@ public class ServicosPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Servicos Extras");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE_CLASS, "title-label");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
-
+        contentPanel.add(topAreaPanel, BorderLayout.NORTH);
         return contentPanel;
     }
 }

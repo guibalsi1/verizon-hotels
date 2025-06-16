@@ -87,4 +87,26 @@ public class ReservaDAO {
 
         return lista;
     }
+
+    public boolean deletar(int id) {
+        String sql = "DELETE FROM reservas WHERE id = ?";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int linhasAfetadas = stmt.executeUpdate();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar reserva: " + e.getMessage());
+        }
+    }
+
+    public boolean deletarPorHospede(String cpfHospede) {
+        String sql = "DELETE FROM reservas WHERE cpf_hospede = ?";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, cpfHospede);
+            int linhasAfetadas = stmt.executeUpdate();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar reservas do hóspede: " + e.getMessage());
+        }
+    }
 }

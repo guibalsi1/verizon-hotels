@@ -21,7 +21,7 @@ public class QuartosPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Quartos");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold+2");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel searchBarPanel = new JPanel(new BorderLayout(8, 0));
@@ -59,12 +59,10 @@ public class QuartosPanel {
         cardsPanel.setOpaque(false);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 
-        // Crie um panel wrapper para centralizar os cards
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         wrapperPanel.setOpaque(false);
         wrapperPanel.add(cardsPanel, BorderLayout.NORTH);
 
-        // Use o wrapperPanel no scrollPane ao invés do cardsPanel diretamente
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

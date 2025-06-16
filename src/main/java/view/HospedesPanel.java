@@ -8,9 +8,11 @@ import view.dialogs.AddGuestDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class HospedesPanel extends JPanel {
     private static final String ICON_BUSCAR = "icons/Search.png";
+    private static final String ICON_EXCLUIR = "icons/Trash.png";
     
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
@@ -20,7 +22,7 @@ public class HospedesPanel extends JPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Hóspedes");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE_CLASS, "title-label");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel searchBarPanel = new JPanel(new BorderLayout(8, 0));
@@ -53,30 +55,24 @@ public class HospedesPanel extends JPanel {
 
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
-        // Painel de cards com ScrollPane
-        // Substitua a criação do cardsPanel por:
         JPanel cardsPanel = new JPanel();
         cardsPanel.setLayout(new GridLayout(0, 2, 20, 20)); // 2 colunas, espaçamento de 20px
         cardsPanel.setOpaque(false);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 
-        // Crie um panel wrapper para centralizar os cards
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         wrapperPanel.setOpaque(false);
         wrapperPanel.add(cardsPanel, BorderLayout.NORTH);
 
-        // Use o wrapperPanel no scrollPane ao invés do cardsPanel diretamente
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Busca hóspedes do banco de dados
         HospedeDAO hospedeDAO = new HospedeDAO();
         List<Hospede> hospedes = hospedeDAO.listar();
 
-        // Cria cards para cada hóspede
         for (Hospede hospede : hospedes) {
             JPanel card = createHospedeCard(hospede);
             cardsPanel.add(card);
@@ -91,19 +87,67 @@ public class HospedesPanel extends JPanel {
         JPanel addGuestComponentsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         addGuestComponentsPanel.setOpaque(false);
 
+        searchButton.addActionListener(e -> {
+            String cpfBusca = searchField.getText().trim();
+
+            if (cpfBusca.isEmpty()) {
+                cardsPanel.removeAll();
+                List<Hospede> todosHospedes = hospedeDAO.listar();
+                for (Hospede h : todosHospedes) {
+                    JPanel card = createHospedeCard(h);
+                    cardsPanel.add(card);
+                }
+            } else {
+                try {
+                    cpfBusca = cpfBusca.replaceAll("[^0-9]", "");
+
+                    Hospede hospede = hospedeDAO.buscarPorCPF(cpfBusca);
+
+                    cardsPanel.removeAll();
+
+                    if (hospede != null) {
+                        JPanel card = createHospedeCard(hospede);
+                        cardsPanel.add(card);
+                    } else {
+                        JLabel mensagem = new JLabel("Nenhum hóspede encontrado com este CPF");
+                        mensagem.setHorizontalAlignment(JLabel.CENTER);
+                        cardsPanel.add(mensagem);
+                    }
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(
+                            contentPanel,
+                            "Erro ao buscar hóspede: " + ex.getMessage(),
+                            "Erro",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+
+            cardsPanel.revalidate();
+            cardsPanel.repaint();
+        });
+
+        JButton finalSearchButton = searchButton;
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    finalSearchButton.doClick();
+                }
+            }
+        });
+
         JLabel addGuestLabel = new JLabel("Adicionar novo Hóspede ");
         addGuestLabel.setOpaque(true);
 
         JButton plusButton = new JButton("+");
         plusButton.putClientProperty(FlatClientProperties.STYLE, "background: #D5BC00; foreground: #1E1E1E; arc: 999");
         plusButton.setOpaque(true);
-        
-        // Adiciona ação ao botão
+
         plusButton.addActionListener(e -> {
             AddGuestDialog dialog = new AddGuestDialog((Frame) SwingUtilities.getWindowAncestor(contentPanel));
             dialog.setVisible(true);
-            
-            // Se um novo hóspede foi adicionado, atualiza a lista
+
             if (dialog.isHospedeAdicionado()) {
                 cardsPanel.removeAll();
                 List<Hospede> hospedesAtual = hospedeDAO.listar();
@@ -129,30 +173,81 @@ public class HospedesPanel extends JPanel {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
-        // Ajuste o tamanho preferido para melhor se adequar ao grid de 2 colunas
         card.setPreferredSize(new Dimension(300, 150));
         card.setMaximumSize(new Dimension(300, 150));
         card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
 
-        // Nome do hóspede
         JLabel nomeLabel = new JLabel(hospede.getNome());
         nomeLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2");
         nomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // CPF
         JLabel cpfLabel = new JLabel("CPF: " + hospede.getCpf());
         cpfLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Telefone
         JLabel telefoneLabel = new JLabel("Tel: " + hospede.getTelefone());
         telefoneLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        buttonPanel.setOpaque(false);
+        ImageIcon deleteIconPng = null;
+        deleteIconPng = new ImageIcon(Objects.requireNonNull(HospedesPanel.class.getClassLoader().getResource(ICON_EXCLUIR)));
+        JButton deleteButton = new JButton(deleteIconPng);
+        deleteButton.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 999");
+        deleteButton.setOpaque(true);
+        buttonPanel.add(deleteButton);
+        deleteButton.addActionListener(e -> {
+            int confirma = JOptionPane.showConfirmDialog(
+                SwingUtilities.getWindowAncestor(card),
+                "Tem certeza que deseja excluir o hóspede " + hospede.getNome() + "?",
+                "Confirmar Exclusão",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (confirma == JOptionPane.YES_OPTION) {
+                try {
+                    HospedeDAO hospedeDAO = new HospedeDAO();
+                    boolean deletado = hospedeDAO.deletar(hospede.getCpf());
+                    
+                    if (deletado) {
+                        Container cardsPanel = card.getParent();
+                        cardsPanel.remove(card);
+                        cardsPanel.revalidate();
+                        cardsPanel.repaint();
+                        
+                        JOptionPane.showMessageDialog(
+                            SwingUtilities.getWindowAncestor(card),
+                            "Hóspede excluído com sucesso!",
+                            "Sucesso",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            SwingUtilities.getWindowAncestor(card),
+                            "Não foi possível excluir o hóspede.",
+                            "Erro",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(
+                        SwingUtilities.getWindowAncestor(card),
+                        "Erro ao excluir hóspede: " + ex.getMessage(),
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
 
         card.add(nomeLabel);
         card.add(Box.createRigidArea(new Dimension(0, 10)));
         card.add(cpfLabel);
         card.add(Box.createRigidArea(new Dimension(0, 5)));
         card.add(telefoneLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 20)));
+        card.add(buttonPanel, BorderLayout.SOUTH);
 
         return card;
     }

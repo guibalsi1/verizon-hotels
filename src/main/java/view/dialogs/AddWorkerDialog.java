@@ -23,14 +23,12 @@ public class AddWorkerDialog extends JDialog {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // Painel principal com padding
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Nome
         gbc.gridx = 0;
         gbc.gridy = 0;
         mainPanel.add(new JLabel("Nome:"), gbc);
@@ -40,7 +38,6 @@ public class AddWorkerDialog extends JDialog {
         nomeField = new JTextField(20);
         mainPanel.add(nomeField, gbc);
 
-        // CPF
         gbc.gridx = 0;
         gbc.gridy = 1;
         mainPanel.add(new JLabel("CPF:"), gbc);
@@ -64,25 +61,21 @@ public class AddWorkerDialog extends JDialog {
         cargoField = new JTextField(20); // Inicialização do campo
         mainPanel.add(cargoField, gbc);
 
-        // Painel de botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton salvarButton = new JButton("Salvar");
         JButton cancelarButton = new JButton("Cancelar");
 
-        // Estilização dos botões
         salvarButton.putClientProperty(FlatClientProperties.STYLE,
                 "background: #4CAF50; foreground: #FFFFFF; arc: 8");
         cancelarButton.putClientProperty(FlatClientProperties.STYLE,
                 "background: #f44336; foreground: #FFFFFF; arc: 8");
 
-        // Ação do botão Salvar
         salvarButton.addActionListener((ActionEvent e) -> {
             if (validarCampos()) {
                 salvarFuncionario();
             }
         });
 
-        // Ação do botão Cancelar
         cancelarButton.addActionListener(e -> dispose());
 
         buttonPanel.add(salvarButton);

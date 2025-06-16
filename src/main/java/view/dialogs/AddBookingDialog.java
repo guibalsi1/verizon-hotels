@@ -1,6 +1,7 @@
 package view.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.toedter.calendar.JCalendar;
 import control.dao.HospedeDAO;
 import control.dao.QuartoDAO;
 import control.dao.ReservaDAO;
@@ -14,12 +15,13 @@ import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
 
 public class AddBookingDialog extends JDialog {
     private JComboBox<Hospede> hospedeComboBox;
     private JComboBox<Quarto> quartoComboBox;
-    private JTextField checkInField;
-    private JTextField checkOutField;
+    private JCalendar checkInField;
+    private JCalendar checkOutField;
     private boolean reservaAdicionada = false;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final DefaultListCellRenderer hospedeRenderer = new DefaultListCellRenderer() {
@@ -27,8 +29,7 @@ public class AddBookingDialog extends JDialog {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                     boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (value instanceof Hospede) {
-                Hospede hospede = (Hospede) value;
+            if (value instanceof Hospede hospede) {
                 setText(hospede.getNome());
             }
             return this;
@@ -40,9 +41,8 @@ public class AddBookingDialog extends JDialog {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                     boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (value instanceof Quarto) {
-                Quarto quarto = (Quarto) value;
-                setText("Quarto " + quarto.getNumero());  // Assumindo que existe um método getNumero()
+            if (value instanceof Quarto quarto) {
+                setText("Quarto " + quarto.getNumero());
             }
             return this;
         }
@@ -56,14 +56,12 @@ public class AddBookingDialog extends JDialog {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // Painel principal com padding
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Hóspede
         gbc.gridx = 0;
         gbc.gridy = 0;
         mainPanel.add(new JLabel("Hóspede:"), gbc);
@@ -78,7 +76,6 @@ public class AddBookingDialog extends JDialog {
         }
         mainPanel.add(hospedeComboBox, gbc);
 
-        // Quarto
         gbc.gridx = 0;
         gbc.gridy = 1;
         mainPanel.add(new JLabel("Quarto:"), gbc);
@@ -94,45 +91,39 @@ public class AddBookingDialog extends JDialog {
         }
         mainPanel.add(quartoComboBox, gbc);
 
-        // Check-in
         gbc.gridx = 0;
         gbc.gridy = 2;
         mainPanel.add(new JLabel("Data Check-in (YYYY-MM-DD):"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        checkInField = new JTextField(10);
+        checkInField = new JCalendar();
         mainPanel.add(checkInField, gbc);
 
-        // Check-out
         gbc.gridx = 0;
         gbc.gridy = 3;
         mainPanel.add(new JLabel("Data Check-out (YYYY-MM-DD):"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
-        checkOutField = new JTextField(10);
+        checkOutField = new JCalendar();
         mainPanel.add(checkOutField, gbc);
 
-        // Painel de botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton salvarButton = new JButton("Salvar");
         JButton cancelarButton = new JButton("Cancelar");
 
-        // Estilização dos botões
         salvarButton.putClientProperty(FlatClientProperties.STYLE,
                 "background: #4CAF50; foreground: #FFFFFF; arc: 8");
         cancelarButton.putClientProperty(FlatClientProperties.STYLE,
                 "background: #f44336; foreground: #FFFFFF; arc: 8");
 
-        // Ação do botão Salvar
         salvarButton.addActionListener((ActionEvent e) -> {
             if (validarCampos()) {
                 salvarReserva();
             }
         });
 
-        // Ação do botão Cancelar
         cancelarButton.addActionListener(e -> dispose());
 
         buttonPanel.add(salvarButton);
@@ -160,8 +151,8 @@ public class AddBookingDialog extends JDialog {
         }
 
         try {
-            LocalDate checkIn = LocalDate.parse(checkInField.getText(), dateFormatter);
-            LocalDate checkOut = LocalDate.parse(checkOutField.getText(), dateFormatter);
+            LocalDate checkIn = LocalDate.parse(coverterData(checkInField.getCalendar()), dateFormatter);
+            LocalDate checkOut = LocalDate.parse(coverterData(checkOutField.getCalendar()), dateFormatter);
 
             if (checkOut.isBefore(checkIn)) {
                 JOptionPane.showMessageDialog(this, "A data de check-out deve ser posterior à data de check-in.",
@@ -177,12 +168,18 @@ public class AddBookingDialog extends JDialog {
         return true;
     }
 
+    private static String coverterData (Calendar dataIntrodusida) {
+        String data = null;
+        data = String.valueOf(dataIntrodusida.get(Calendar.YEAR)) + "-" + String.valueOf(dataIntrodusida.get(Calendar.MONTH)) + "-" + String.valueOf(dataIntrodusida.get(Calendar.DAY_OF_MONTH));
+        return data;
+    }
+
     private void salvarReserva() {
         try {
             Hospede hospede = (Hospede) hospedeComboBox.getSelectedItem();
             Quarto quarto = (Quarto) quartoComboBox.getSelectedItem();
-            String checkIn = checkInField.getText();
-            String checkOut = checkOutField.getText();
+            String checkIn = coverterData(checkInField.getCalendar());
+            String checkOut = coverterData(checkInField.getCalendar());
 
             Reserva novaReserva = new Reserva(hospede, quarto, checkIn, checkOut);
             ReservaDAO reservaDAO = new ReservaDAO();

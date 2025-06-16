@@ -65,4 +65,15 @@ public class FuncionarioDAO {
         }
         return lista;
     }
+
+    public boolean deletar(String cpf) {
+        String sql = "DELETE FROM funcionarios WHERE cpf = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, cpf);
+            int linhasAfetadas = stmt.executeUpdate();
+            return linhasAfetadas > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar funcionário: " + e.getMessage());
+        }
+    }
 }

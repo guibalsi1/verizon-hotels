@@ -23,7 +23,6 @@ public class AddGuestDialog extends JDialog {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // Painel principal com padding
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -55,7 +54,6 @@ public class AddGuestDialog extends JDialog {
         }
         mainPanel.add(cpfField, gbc);
 
-        // Telefone
         gbc.gridx = 0;
         gbc.gridy = 2;
         mainPanel.add(new JLabel("Telefone:"), gbc);
@@ -70,25 +68,20 @@ public class AddGuestDialog extends JDialog {
         }
         mainPanel.add(telefoneField, gbc);
 
-        // Painel de botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton salvarButton = new JButton("Salvar");
         JButton cancelarButton = new JButton("Cancelar");
 
-        // Estilização dos botões
         salvarButton.putClientProperty(FlatClientProperties.STYLE,
                 "background: #4CAF50; foreground: #FFFFFF; arc: 8");
         cancelarButton.putClientProperty(FlatClientProperties.STYLE,
                 "background: #f44336; foreground: #FFFFFF; arc: 8");
-
-        // Ação do botão Salvar
         salvarButton.addActionListener((ActionEvent e) -> {
             if (validarCampos()) {
                 salvarHospede();
             }
         });
 
-        // Ação do botão Cancelar
         cancelarButton.addActionListener(e -> dispose());
 
         buttonPanel.add(salvarButton);

@@ -14,8 +14,9 @@ public class ConfigPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Configurações");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE_CLASS, "title-label");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
+        contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
 
         return contentPanel;

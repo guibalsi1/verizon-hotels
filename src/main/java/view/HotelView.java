@@ -10,7 +10,7 @@ public class HotelView extends JFrame {
     public HotelView() {
         setTitle("Verizon Hotels");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(900, 670));
+        setMinimumSize(new Dimension(1000, 670));
         setLocationRelativeTo(null);
 
         JPanel contentPanel = new JPanel(new CardLayout());

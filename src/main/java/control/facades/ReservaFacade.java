@@ -22,28 +22,22 @@ public class ReservaFacade {
 
     public Reserva criarReserva(int id, String cpfResponsavel, int numeroQuarto, String dataEntrada, String dataSaida, List<String> cpfsParticipantes) throws ReservaInvalidaException {
         try {
-
-            // Buscar o hóspede responsável
             Hospede responsavel = hospedeDAO.buscarPorCPF(cpfResponsavel);
             if (responsavel == null) {
                 throw new ReservaInvalidaException("Responsável não encontrado: " + cpfResponsavel);
             }
 
-            // Buscar o quarto
             Quarto quarto = quartoDAO.buscarPorNumero(numeroQuarto);
             if (quarto == null || !quarto.isDisponivel()) {
                 throw new ReservaInvalidaException("Quarto indisponível ou inexistente: " + numeroQuarto);
             }
 
-            // Criar a reserva
             Reserva reserva = new Reserva(id,responsavel, quarto, dataEntrada, dataSaida);
 
-            // Adicionar o responsável como participante
             reserva.adicionarParticipante(responsavel);
 
-            // Buscar e adicionar os demais participantes
             for (String cpf : cpfsParticipantes) {
-                if (cpf.equals(cpfResponsavel)) continue; // já adicionado
+                if (cpf.equals(cpfResponsavel)) continue;
                 Hospede participante = hospedeDAO.buscarPorCPF(cpf);
                 if (participante != null) {
                     reserva.adicionarParticipante(participante);
@@ -52,10 +46,7 @@ public class ReservaFacade {
                 }
             }
 
-            // Persistir no banco de dados
             reservaDAO.salvar(reserva);
-
-            // Atualizar disponibilidade do quarto (se quiser)
             quarto.setDisponivel(false);
             quartoDAO.atualizar(quarto);
 

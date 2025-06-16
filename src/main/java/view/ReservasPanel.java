@@ -21,7 +21,7 @@ public class ReservasPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Reservas");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE_CLASS, "title-label");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel searchBarPanel = new JPanel(new BorderLayout(8, 0));
@@ -54,21 +54,16 @@ public class ReservasPanel {
 
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
-        // Painel de cards com ScrollPane
-        // Substitua a criação do cardsPanel por:
         JPanel cardsPanel = new JPanel();
         cardsPanel.setLayout(new BoxLayout(cardsPanel, BoxLayout.Y_AXIS));
         cardsPanel.setOpaque(false);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 
-        // Adiciona ScrollPane
         JScrollPane scrollPane = new JScrollPane(cardsPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-
-        // Adiciona o scrollPane ao contentPanel (adicione esta linha)
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         HospedeDAO hospedeDAO = new HospedeDAO();
@@ -76,7 +71,6 @@ public class ReservasPanel {
         ReservaDAO reservaDAO = new ReservaDAO();
         List<Reserva> reservas = reservaDAO.listarTodas(hospedeDAO, quartoDAO);
 
-        // Cria cards para cada reserva
         for (Reserva reserva: reservas) {
             JPanel card = createReservaCard(reserva);
             cardsPanel.add(card);
@@ -128,7 +122,6 @@ public class ReservasPanel {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
-        // Ajusta a largura para ocupar todo o espaço horizontal e altura fixa
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
         card.setPreferredSize(new Dimension(Integer.MAX_VALUE, 200));
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -136,24 +129,18 @@ public class ReservasPanel {
                 BorderFactory.createEmptyBorder(10, 15, 10, 15) // Padding interno do card
         ));
 
-
-        // Responsável
         JLabel responsavelLabel = new JLabel("Responsável: " + reserva.getHospede().getNome());
         responsavelLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2");
         responsavelLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Quarto
         JLabel quartoLabel = new JLabel("Quarto: " + reserva.getQuarto().getNumero() + " (" + reserva.getQuarto().getTipo() + ")");
         quartoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Período
         JLabel periodoLabel = new JLabel("Período: " + reserva.getDataEntrada() + " a " + reserva.getDataSaida());
         periodoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Participantes
         JLabel participantesLabel = new JLabel("Participantes:");
         participantesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         JPanel participantesPanel = new JPanel();
         participantesPanel.setLayout(new BoxLayout(participantesPanel, BoxLayout.Y_AXIS));
         participantesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -165,12 +152,10 @@ public class ReservasPanel {
             participantesPanel.add(nome);
         }
 
-        // Botão "Gerar Fatura" (a ação será implementada futuramente)
         JButton btnFatura = new JButton("Gerar Fatura");
         btnFatura.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnFatura.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
 
-        // Montagem final
         card.add(responsavelLabel);
         card.add(Box.createRigidArea(new Dimension(0, 8)));
         card.add(quartoLabel);
