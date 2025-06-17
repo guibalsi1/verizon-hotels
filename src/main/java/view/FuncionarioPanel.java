@@ -10,7 +10,6 @@ import java.awt.*;
 import java.util.List;
 
 public class FuncionarioPanel {
-    private static final String ICON_BUSCAR = "icons/Search.png";
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
@@ -21,35 +20,6 @@ public class FuncionarioPanel {
         JLabel titleLabel = new JLabel("Funcionários");
         titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
-
-        JPanel searchBarPanel = new JPanel(new BorderLayout(8, 0));
-        searchBarPanel.setOpaque(false);
-        JTextField searchField = new JTextField();
-        searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Busca por Nome,Cargo...");
-
-        JButton searchButton;
-        ImageIcon searchIconPng = null;
-        try {
-            java.net.URL imgUrl = HospedesPanel.class.getClassLoader().getResource(ICON_BUSCAR);
-            if (imgUrl != null) {
-                searchIconPng = new ImageIcon(imgUrl);
-                Image scaledImg = searchIconPng.getImage().getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-                searchButton = new JButton(new ImageIcon(scaledImg));
-            } else {
-                searchButton = new JButton("🔍");
-                System.err.println("Ícone de busca não encontrado: " + ICON_BUSCAR);
-            }
-        } catch (Exception e) {
-            searchButton = new JButton("🔍");
-            System.err.println("Erro ao carregar ícone de busca: " + e.getMessage());
-        }
-        searchButton.setName("searchButton");
-        searchButton.setToolTipText("Buscar");
-
-        searchBarPanel.add(searchField, BorderLayout.CENTER);
-        searchBarPanel.add(searchButton, BorderLayout.EAST);
-        topAreaPanel.add(searchBarPanel, BorderLayout.CENTER);
-
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
         JPanel cardsPanel = new JPanel();

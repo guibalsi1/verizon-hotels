@@ -1,18 +1,19 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import control.dao.ReservaDAO;
-import control.dao.QuartoDAO;
-import control.dao.HospedeDAO;
+import control.facade.ReservaFacade;
+import control.utilities.GeradorFaturaPDF;
 import model.Reserva;
 import view.dialogs.AddBookingDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class ReservasPanel {
     private static final String ICON_BUSCAR = "icons/Search.png";
+    private static final String ICON_EXCLUIR = "icons/Trash.png";
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
@@ -66,10 +67,8 @@ public class ReservasPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
-        HospedeDAO hospedeDAO = new HospedeDAO();
-        QuartoDAO quartoDAO = new QuartoDAO();
-        ReservaDAO reservaDAO = new ReservaDAO();
-        List<Reserva> reservas = reservaDAO.listarTodas(hospedeDAO, quartoDAO);
+        ReservaFacade reservaFacade = new ReservaFacade();
+        List<Reserva> reservas = reservaFacade.listarTodas();
 
         for (Reserva reserva: reservas) {
             JPanel card = createReservaCard(reserva);
@@ -98,7 +97,7 @@ public class ReservasPanel {
 
             if (dialog.isReservaAdicionada()) {
                 cardsPanel.removeAll();
-                List<Reserva> reservasAtual = reservaDAO.listarTodas(hospedeDAO,quartoDAO);
+                List<Reserva> reservasAtual = reservaFacade.listarTodas();
                 for (Reserva reserva : reservasAtual) {
                     JPanel card = createReservaCard(reserva);
                     cardsPanel.add(card);
@@ -114,6 +113,53 @@ public class ReservasPanel {
         addGuestOuterPanel.add(addGuestComponentsPanel);
         contentPanel.add(addGuestOuterPanel, BorderLayout.SOUTH);
 
+        searchButton.addActionListener(e -> {
+            String idBusca = searchField.getText().trim();
+
+            if (idBusca.isEmpty()) {
+                cardsPanel.removeAll();
+                List<Reserva> todasReservas = reservaFacade.listarTodas();
+                for (Reserva reserva : todasReservas) {
+                    JPanel card = createReservaCard(reserva);
+                    cardsPanel.add(card);
+                }
+            } else {
+                try {
+                    idBusca = idBusca.replaceAll("[^0-9]", "");
+
+                    Reserva reserva = reservaFacade.buscarPorId(Integer.parseInt(idBusca));
+                    cardsPanel.removeAll();
+
+                    if (reserva != null) {
+                        JPanel card = createReservaCard(reserva);
+                        cardsPanel.add(card);
+                    } else {
+                        JLabel mensagem = new JLabel("Nenhuma reserva encontrada com este ID");
+                        mensagem.setHorizontalAlignment(JLabel.CENTER);
+                        cardsPanel.add(mensagem);
+                    }
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(
+                            contentPanel,
+                            "Erro ao buscar reserva: " + ex.getMessage(),
+                            "Erro",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+
+            cardsPanel.revalidate();
+            cardsPanel.repaint();
+        });
+        JButton finalSearchButton = searchButton;
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    finalSearchButton.doClick();
+                }
+            }
+        });
         return contentPanel;
     }
 
@@ -122,10 +168,10 @@ public class ReservasPanel {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
-        card.setPreferredSize(new Dimension(Integer.MAX_VALUE, 200));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
+        card.setPreferredSize(new Dimension(Integer.MAX_VALUE, 300));
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 20, 0), // Espaçamento entre cards
+                BorderFactory.createEmptyBorder(20, 0, 30, 0), // Espaçamento entre cards
                 BorderFactory.createEmptyBorder(10, 15, 10, 15) // Padding interno do card
         ));
 
@@ -152,9 +198,60 @@ public class ReservasPanel {
             participantesPanel.add(nome);
         }
 
+        ImageIcon deleteIconPng = null;
+        deleteIconPng = new ImageIcon(Objects.requireNonNull(ReservasPanel.class.getClassLoader().getResource(ICON_EXCLUIR)));
+        JButton btnCancelar = new JButton(deleteIconPng);
+        btnCancelar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnCancelar.putClientProperty(FlatClientProperties.STYLE, "arc: 999");
+        btnCancelar.addActionListener(e -> {
+            int confirma = JOptionPane.showConfirmDialog(
+                    SwingUtilities.getWindowAncestor(card),
+                    "Tem certeza qu deseja cancelar a reserva " + reserva.getId()   +"? ",
+                    "Cancelar Reserva", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
+            );
+            if (confirma == JOptionPane.YES_OPTION) {
+                try {
+                    ReservaFacade reservaFacade = new ReservaFacade();
+                    boolean deletado = reservaFacade.deletar(reserva.getId());
+                    if (deletado) {
+                        Container cardsPanel = card.getParent();
+                        cardsPanel.remove(card);
+                        cardsPanel.revalidate();
+                        cardsPanel.repaint();
+                        JOptionPane.showMessageDialog(
+                                SwingUtilities.getWindowAncestor(card),
+                                "Reserva cancelada com sucesso!",
+                                "Sucesso",
+                                JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                SwingUtilities.getWindowAncestor(card),
+                                "Erro ao cancelar reserva!",
+                                "Erro",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(
+                            SwingUtilities.getWindowAncestor(card),
+                            "Erro ao cancelar reserva: " + ex.getMessage(),
+                            "Erro",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+
+        });
+
         JButton btnFatura = new JButton("Gerar Fatura");
         btnFatura.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnFatura.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+
+        btnFatura.addActionListener(e -> {
+            GeradorFaturaPDF gerador = new GeradorFaturaPDF();
+            gerador.gerar(reserva);
+        });
 
         card.add(responsavelLabel);
         card.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -167,6 +264,8 @@ public class ReservasPanel {
         card.add(Box.createVerticalGlue());
         card.add(Box.createRigidArea(new Dimension(0, 10)));
         card.add(btnFatura);
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
+        card.add(btnCancelar);
 
         return card;
     }

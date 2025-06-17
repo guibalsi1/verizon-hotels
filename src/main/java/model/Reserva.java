@@ -10,7 +10,6 @@ public class Reserva {
     private Quarto quarto;
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private List<ServicoExtra> servicosExtras;
     private List<Hospede> participantes;
 
     public int getId() {

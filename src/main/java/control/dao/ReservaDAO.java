@@ -27,6 +27,15 @@ public class ReservaDAO {
                     r.setId(generatedKeys.getInt(1));
                 }
             }
+
+            String sqlParticipante = "INSERT INTO reservas_hospedes (reserva_id, cpf_hospede) VALUES (?, ?)";
+            for (Hospede participante : r.getParticipantes()) {
+                try (PreparedStatement stmtParticipante = ConexaoBanco.getConnection().prepareStatement(sqlParticipante)) {
+                    stmtParticipante.setInt(1, r.getId());
+                    stmtParticipante.setString(2, participante.getCpf());
+                    stmtParticipante.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar reserva: " + e.getMessage());
         }
@@ -51,6 +60,7 @@ public class ReservaDAO {
 
                 if (h != null && q != null) {
                     Reserva r = new Reserva(id, h, q, entrada, saida);
+                    carregarParticipantes(r, hospedeDAO);
                     lista.add(r);
                 }
             }
@@ -88,6 +98,21 @@ public class ReservaDAO {
         return lista;
     }
 
+    private void carregarParticipantes(Reserva reserva, HospedeDAO hospedeDAO) throws SQLException {
+        String sql = "SELECT cpf_hospede FROM reservas_hospedes WHERE reserva_id = ?";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, reserva.getId());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String cpfParticipante = rs.getString("cpf_hospede");
+                Hospede participante = hospedeDAO.buscarPorCPF(cpfParticipante);
+                if (participante != null) {
+                    reserva.adicionarParticipante(participante);
+                }
+            }
+        }
+    }
+
     public boolean deletar(int id) {
         String sql = "DELETE FROM reservas WHERE id = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
@@ -108,5 +133,51 @@ public class ReservaDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao deletar reservas do hóspede: " + e.getMessage());
         }
+    }
+    public boolean verificarDisponibilidade(int numeroQuarto, String dataEntrada, String dataSaida) {
+        String sql = "SELECT COUNT(*) FROM reservas WHERE numero_quarto = ? AND data_entrada < ? AND data_saida > ?";
+
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, numeroQuarto);
+            stmt.setString(2, dataSaida);
+            stmt.setString(3, dataEntrada);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao verificar disponibilidade do quarto: " + e.getMessage());
+        }
+        return false;
+    }
+    public Reserva buscaPorId(int id, HospedeDAO hospedeDAO, QuartoDAO quartoDAO) {
+        String sql = "SELECT * FROM reservas WHERE id = ?";
+        
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                String cpf = rs.getString("cpf_hospede");
+                int numeroQuarto = rs.getInt("numero_quarto");
+                String dataEntrada = rs.getString("data_entrada");
+                String dataSaida = rs.getString("data_saida");
+                
+                Hospede hospede = hospedeDAO.buscarPorCPF(cpf);
+                Quarto quarto = quartoDAO.buscarPorNumero(numeroQuarto);
+                
+                if (hospede != null && quarto != null) {
+                    Reserva reserva = new Reserva(id, hospede, quarto, dataEntrada, dataSaida);
+                    carregarParticipantes(reserva, hospedeDAO);
+                    return reserva;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar reserva por ID: " + e.getMessage());
+        }
+        
+        return null;
     }
 }

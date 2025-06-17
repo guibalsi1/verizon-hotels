@@ -56,7 +56,7 @@ public class HospedesPanel extends JPanel {
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
         JPanel cardsPanel = new JPanel();
-        cardsPanel.setLayout(new GridLayout(0, 2, 20, 20)); // 2 colunas, espaçamento de 20px
+        cardsPanel.setLayout(new GridLayout(0, 2, 20, 20));
         cardsPanel.setOpaque(false);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 

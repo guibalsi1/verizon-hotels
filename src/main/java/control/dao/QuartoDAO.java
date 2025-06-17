@@ -84,4 +84,31 @@ public class QuartoDAO {
         }
         return null;
     }
+    public List<Quarto> listarQuartosDisponiveis(String dataEntrada, String dataSaida) {
+        List<Quarto> lista = new ArrayList<>();
+        // Este SQL seleciona todos os quartos cujo número NÃO ESTÁ na lista de quartos
+        // que possuem uma reserva conflitante no período desejado.
+        String sql = "SELECT * FROM quartos WHERE numero NOT IN (" +
+                "  SELECT numero_quarto FROM reservas WHERE data_entrada < ? AND data_saida > ?" +
+                ")";
+
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, dataSaida);
+            stmt.setString(2, dataEntrada);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int numero = rs.getInt("numero");
+                String tipo = rs.getString("tipo");
+                double preco = rs.getDouble("preco");
+                int qtd = rs.getInt("quantidade_pessoas");
+                boolean disponivel = rs.getBoolean("disponivel"); // Embora a lógica de data seja mais importante, mantemos.
+                Quarto quarto = tipo.equalsIgnoreCase("Simples") ? new QuartoSimples(numero, preco, qtd) : new QuartoLuxo(numero, preco, qtd);
+                quarto.setDisponivel(disponivel);
+                lista.add(quarto);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar quartos disponíveis: " + e.getMessage());
+        }
+        return lista;
+    }
 }

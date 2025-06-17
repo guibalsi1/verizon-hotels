@@ -9,7 +9,6 @@ public class NavPanel extends JPanel {
     private static final String ICON_FUNCIONARIOS = "icons/Target.png";
     private static final String ICON_QUARTOS = "icons/Home.png";
     private static final String ICON_RESERVAS = "icons/Book.png";
-    private static final String ICON_SERVICOS = "icons/Star.png";
     private static final String ICON_RELATORIOS = "icons/Table.png";
     private static final String ICON_CONFIGURACOES = "icons/Settings.png";
     private static final String ICON_LOGO = "icons/Logo.png";
@@ -33,15 +32,15 @@ public class NavPanel extends JPanel {
 
         String[] navText = {
                 "Hóspedes", "Funcionários", "Quartos", "Reservas",
-                "Serviços Extras", "Relatórios", "Configurações"
+                "Relatórios", "Configurações"
         };
         String[] iconPaths = {
                 ICON_HOSPEDES, ICON_FUNCIONARIOS, ICON_QUARTOS, ICON_RESERVAS,
-                ICON_SERVICOS, ICON_RELATORIOS, ICON_CONFIGURACOES
+                ICON_RELATORIOS, ICON_CONFIGURACOES
         };
         String[] cardNames = {
                 "hospedes", "funcionarios", "quartos", "reservas",
-                "servicos", "relatorios", "configuracoes"
+                "relatorios", "configuracoes"
         };
 
         for (int i = 0; i < navText.length; i++) {

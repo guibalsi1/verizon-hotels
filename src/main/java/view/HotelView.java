@@ -18,7 +18,6 @@ public class HotelView extends JFrame {
         contentPanel.add(QuartosPanel.createContentPanel(), "quartos");
         contentPanel.add(FuncionarioPanel.createContentPanel(), "funcionarios");
         contentPanel.add(ReservasPanel.createContentPanel(), "reservas");
-        contentPanel.add(ServicosPanel.createContentPanel(), "servicos");
         contentPanel.add(RelatoriosPanel.createContentPanel(), "relatorios");
         contentPanel.add(ConfigPanel.createContentPanel(), "configuracoes");
 
