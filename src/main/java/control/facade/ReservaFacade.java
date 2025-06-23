@@ -6,6 +6,7 @@ import model.Reserva;
 import model.exceptions.ReservaInvalidaException;
 
 import java.util.List;
+import java.util.Map;
 
 public class ReservaFacade {
     private final ReservaDAO reservaDAO;
@@ -40,6 +41,10 @@ public class ReservaFacade {
 
     public boolean deletar(int id) {
         return reservaDAO.deletar(id);
+    }
+
+    public Map<String, Double> getFaturamentoMensal() {
+        return reservaDAO.getFaturamentoMensal();
     }
 
 //    public Reserva criarReserva(int id, String cpfResponsavel, int numeroQuarto, String dataEntrada, String dataSaida, List<String> cpfsParticipantes) throws ReservaInvalidaException {

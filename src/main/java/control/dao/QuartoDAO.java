@@ -13,6 +13,10 @@ import java.util.List;
 
 public class QuartoDAO {
 
+    /**
+     * Salva um quarto no banco de dados SQLite
+     * @param quarto Classe Quarto
+     */
     public void salvar(Quarto quarto) {
         String sql = "INSERT INTO quartos (numero, tipo, disponivel, preco, quantidade_pessoas) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
@@ -27,6 +31,11 @@ public class QuartoDAO {
         }
     }
 
+    /**
+     * Atualiza a disponibilidade do quarto
+     * @param quarto Classe Quarto
+     * --- EM DESUSO ---
+     */
     public void atualizar(Quarto quarto) {
         String sql = "UPDATE quartos SET tipo = ?, disponivel = ?, preco = ?, quantidade_pessoas = ? WHERE numero = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
@@ -41,6 +50,10 @@ public class QuartoDAO {
         }
     }
 
+    /**
+     * Lista os quartos presentes no banco de dados
+     * @return um ArrayList de Quarto
+     */
     public List<Quarto> listar() {
         List<Quarto> lista = new ArrayList<>();
         String sql = "SELECT * FROM quartos";
@@ -63,6 +76,13 @@ public class QuartoDAO {
         return lista;
     }
 
+    /**
+     * Busca um quarto no banco de dados pelo número informado.
+     *
+     * @param numero o número do quarto a ser buscado
+     * @return um objeto do tipo Quarto correspondendo ao número informado ou
+     *         null se nenhum quarto for encontrado
+     */
     public Quarto buscarPorNumero(int numero) {
         String sql = "SELECT * FROM quartos WHERE numero = ?";
 
@@ -84,10 +104,15 @@ public class QuartoDAO {
         }
         return null;
     }
+
+    /**
+     * Lista os quartos disponiveis nos dadas datas
+     * @param dataEntrada data do Check-in
+     * @param dataSaida data do Check-out
+     * @return
+     */
     public List<Quarto> listarQuartosDisponiveis(String dataEntrada, String dataSaida) {
         List<Quarto> lista = new ArrayList<>();
-        // Este SQL seleciona todos os quartos cujo número NÃO ESTÁ na lista de quartos
-        // que possuem uma reserva conflitante no período desejado.
         String sql = "SELECT * FROM quartos WHERE numero NOT IN (" +
                 "  SELECT numero_quarto FROM reservas WHERE data_entrada < ? AND data_saida > ?" +
                 ")";
@@ -101,7 +126,7 @@ public class QuartoDAO {
                 String tipo = rs.getString("tipo");
                 double preco = rs.getDouble("preco");
                 int qtd = rs.getInt("quantidade_pessoas");
-                boolean disponivel = rs.getBoolean("disponivel"); // Embora a lógica de data seja mais importante, mantemos.
+                boolean disponivel = rs.getBoolean("disponivel");
                 Quarto quarto = tipo.equalsIgnoreCase("Simples") ? new QuartoSimples(numero, preco, qtd) : new QuartoLuxo(numero, preco, qtd);
                 quarto.setDisponivel(disponivel);
                 lista.add(quarto);

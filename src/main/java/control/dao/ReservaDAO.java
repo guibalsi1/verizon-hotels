@@ -9,10 +9,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReservaDAO {
 
+    /**
+     * Salva uma reserva no banco de dados SQLite
+     * @param r Classe Reserva
+     */
     public void salvar(Reserva r) {
         String sql = "INSERT INTO reservas (cpf_hospede, numero_quarto, data_entrada, data_saida) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -41,6 +47,12 @@ public class ReservaDAO {
         }
     }
 
+    /**
+     * Lista todas as reservas do banco de dados
+     * @param hospedeDAO instância do HospedeDAO
+     * @param quartoDAO instância do QuartoDAO
+     * @return um ArrayList de Reserva
+     */
     public List<Reserva> listarTodas(HospedeDAO hospedeDAO, QuartoDAO quartoDAO) {
         List<Reserva> lista = new ArrayList<>();
         String sql = "SELECT * FROM reservas";
@@ -71,6 +83,13 @@ public class ReservaDAO {
     }
 
 
+    /**
+     * Lista todas as reservas de um hospede
+     * @param cpfHospede chave estrangeira da tabela reservas
+     * @param quartoDAO instâcia do QuartoDAO
+     * @param hospede Classe Hospede
+     * @return um ArrayList de Reserva
+     */
     public List<Reserva> listarPorHospede(String cpfHospede, QuartoDAO quartoDAO, Hospede hospede) {
         List<Reserva> lista = new ArrayList<>();
         String sql = "SELECT * FROM reservas WHERE cpf_hospede = ?";
@@ -98,6 +117,11 @@ public class ReservaDAO {
         return lista;
     }
 
+    /**
+     * Salva os participantes da reserva no banco de dados
+     * @param reserva Class reserva
+     * @param hospedeDAO instâcia do HospedeDAO
+     */
     private void carregarParticipantes(Reserva reserva, HospedeDAO hospedeDAO) throws SQLException {
         String sql = "SELECT cpf_hospede FROM reservas_hospedes WHERE reserva_id = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
@@ -113,6 +137,11 @@ public class ReservaDAO {
         }
     }
 
+    /**
+     * Faz a exclusão de uma reserva desejada no banco de dados
+     * @param id chave primaria da tabela reservas
+     * @return Retorna true se a exclusão foi feita, false caso não foi encontrado a reserva
+     */
     public boolean deletar(int id) {
         String sql = "DELETE FROM reservas WHERE id = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
@@ -179,5 +208,24 @@ public class ReservaDAO {
         }
         
         return null;
+    }
+
+    public Map<String, Double> getFaturamentoMensal() {
+        Map<String, Double> faturamentoMensal = new LinkedHashMap<>();
+        String sql = "SELECT strftime('%m-%Y', data_entrada) AS mes, " +
+                "(julianday(data_saida) - julianday(data_entrada)) * q.preco AS faturamento " +
+                "FROM reservas r JOIN quartos q ON r.numero_quarto = q.numero" +
+                " GROUP BY mes";
+        try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String mes = rs.getString("mes");
+                double faturamento = rs.getDouble("faturamento");
+                faturamentoMensal.merge(mes, faturamento, Double::sum);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar faturamento mensal: " + e.getMessage());
+        }
+        return faturamentoMensal;
     }
 }

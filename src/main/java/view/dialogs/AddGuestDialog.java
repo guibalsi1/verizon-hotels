@@ -29,7 +29,6 @@ public class AddGuestDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Nome
         gbc.gridx = 0;
         gbc.gridy = 0;
         mainPanel.add(new JLabel("Nome:"), gbc);
@@ -39,7 +38,6 @@ public class AddGuestDialog extends JDialog {
         nomeField = new JTextField(20);
         mainPanel.add(nomeField, gbc);
 
-        // CPF
         gbc.gridx = 0;
         gbc.gridy = 1;
         mainPanel.add(new JLabel("CPF:"), gbc);
@@ -68,6 +66,17 @@ public class AddGuestDialog extends JDialog {
         }
         mainPanel.add(telefoneField, gbc);
 
+        JPanel buttonPanel = getJPanel();
+
+        add(mainPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        pack();
+        setLocationRelativeTo(getOwner());
+        setResizable(false);
+    }
+
+    private JPanel getJPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton salvarButton = new JButton("Salvar");
         JButton cancelarButton = new JButton("Cancelar");
@@ -86,13 +95,7 @@ public class AddGuestDialog extends JDialog {
 
         buttonPanel.add(salvarButton);
         buttonPanel.add(cancelarButton);
-
-        add(mainPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        pack();
-        setLocationRelativeTo(getOwner());
-        setResizable(false);
+        return buttonPanel;
     }
 
     private boolean validarCampos() {

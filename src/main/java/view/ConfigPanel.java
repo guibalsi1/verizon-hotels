@@ -1,24 +1,40 @@
 package view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import control.utilities.ThemeManager;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ConfigPanel {
-    public static JPanel createContentPanel() {
-        JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
+public class ConfigPanel extends JPanel {
+
+    public ConfigPanel() {
+        super(new BorderLayout(15, 15));
+        setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
         JPanel topAreaPanel = new JPanel(new BorderLayout(0, 15));
         topAreaPanel.setOpaque(false);
-
         JLabel titleLabel = new JLabel("Configurações");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #FAED27;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
-        contentPanel.add(topAreaPanel, BorderLayout.NORTH);
+        add(topAreaPanel, BorderLayout.NORTH);
 
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 10));
 
-        return contentPanel;
+        JLabel themeLabel = new JLabel("Tema da Aplicação:");
+        optionsPanel.add(themeLabel);
+        optionsPanel.add(Box.createHorizontalStrut(10));
+
+        JToggleButton themeToggle = new JToggleButton("Modo Escuro");
+        themeToggle.setSelected(ThemeManager.isDarkMode());
+        themeToggle.addActionListener(e -> {
+            boolean useDark = themeToggle.isSelected();
+            JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            ThemeManager.toggleTheme(useDark, mainFrame);
+        });
+
+        optionsPanel.add(themeToggle);
+        add(optionsPanel, BorderLayout.CENTER);
     }
 }

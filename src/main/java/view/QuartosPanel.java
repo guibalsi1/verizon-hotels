@@ -20,7 +20,7 @@ public class QuartosPanel {
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Quartos");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #F1DB52;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
 
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);

@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 public class Reserva {
     private int id;
-    private Hospede hospede;
-    private Quarto quarto;
-    private LocalDate checkIn;
-    private LocalDate checkOut;
-    private List<Hospede> participantes;
+    private final Hospede hospede;
+    private final Quarto quarto;
+    private final LocalDate checkIn;
+    private final LocalDate checkOut;
+    private final List<Hospede> participantes;
 
     public int getId() {
         return id;

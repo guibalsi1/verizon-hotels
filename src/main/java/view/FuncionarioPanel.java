@@ -12,18 +12,18 @@ import java.util.List;
 public class FuncionarioPanel {
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
         JPanel topAreaPanel = new JPanel(new BorderLayout(0, 15));
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Funcionários");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #F1DB52;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
         contentPanel.add(topAreaPanel, BorderLayout.NORTH);
 
         JPanel cardsPanel = new JPanel();
-        cardsPanel.setLayout(new GridLayout(0, 2, 20, 20)); // 2 colunas, espaçamento de 20px
+        cardsPanel.setLayout(new GridLayout(0, 2, 20, 20));
         cardsPanel.setOpaque(false);
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 25, 0));
 

@@ -16,13 +16,13 @@ public class ReservasPanel {
     private static final String ICON_EXCLUIR = "icons/Trash.png";
     public static JPanel createContentPanel() {
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); // Padding da área de conteúdo
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
         JPanel topAreaPanel = new JPanel(new BorderLayout(0, 15));
         topAreaPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("Reservas");
-        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #1E1E1E;");
+        titleLabel.putClientProperty(FlatClientProperties.STYLE, "font: bold +2; foreground: #F1DB52;");
         topAreaPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel searchBarPanel = new JPanel(new BorderLayout(8, 0));
@@ -79,7 +79,7 @@ public class ReservasPanel {
         addGuestOuterPanel.setOpaque(false);
         addGuestOuterPanel.setBorder(BorderFactory.createEmptyBorder(0,0,5,0));
 
-        JPanel addGuestComponentsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)); // Sem espaçamento interno
+        JPanel addGuestComponentsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         addGuestComponentsPanel.setOpaque(false);
 
 
@@ -104,6 +104,7 @@ public class ReservasPanel {
                 }
                 cardsPanel.revalidate();
                 cardsPanel.repaint();
+
             }
         });
 
@@ -167,7 +168,7 @@ public class ReservasPanel {
     private static JPanel createReservaCard(Reserva reserva) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15");
+        card.putClientProperty(FlatClientProperties.STYLE, "background: #FFFFFF; arc: 15; foreground: #000000;");
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
         card.setPreferredSize(new Dimension(Integer.MAX_VALUE, 300));
         card.setBorder(BorderFactory.createCompoundBorder(

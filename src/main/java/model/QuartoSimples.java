@@ -1,10 +1,10 @@
 package model;
 
 public class QuartoSimples implements Quarto {
-    private int numero;
+    private final int numero;
     private boolean disponivel;
-    private double precoPorNoite;
-    private int quantidadePessoas;
+    private final double precoPorNoite;
+    private final int quantidadePessoas;
 
     public QuartoSimples(int numero, double precoPorNoite, int quantidadePessoas) {
         this.numero = numero;

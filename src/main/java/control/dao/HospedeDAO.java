@@ -12,6 +12,10 @@ import java.util.List;
 
 public class HospedeDAO {
 
+    /**
+     * Salva um Hospede no banco de dados SQLite
+     * @param hospede Classe Hospede
+     */
     public void salvar(Hospede hospede) {
         String sql = "INSERT INTO hospedes (cpf, nome, telefone) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
@@ -25,6 +29,10 @@ public class HospedeDAO {
         }
     }
 
+    /**
+     * Lista todos os hospedes do banco de dados
+     * @return Retorna um ArrayList de hospedes
+     */
     public List<Hospede> listar() {
         List<Hospede> lista = new ArrayList<>();
         String sql = "SELECT * FROM hospedes";
@@ -41,6 +49,11 @@ public class HospedeDAO {
         return lista;
     }
 
+    /**
+     * Faz a busca do Funcionario no banco de dados
+     * @param cpf chave primaria da tabela hospedes
+     * @return o hospede com o cpf desejado ou null se não encontrado
+     */
     public Hospede buscarPorCPF(String cpf) {
         String sql = "SELECT * FROM hospedes WHERE cpf = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)){
@@ -59,6 +72,11 @@ public class HospedeDAO {
         return null;
     }
 
+    /**
+     * Faz a exclusão de um hospede desejado no banco de dados
+     * @param cpf chave primaria da tabela hospedes
+     * @return Retorna true se a exclusão foi feita, false caso não foi encontrado o hospede
+     */
     public boolean deletar(String cpf) {
         String sql = "DELETE FROM hospedes WHERE cpf = ?";
         try (PreparedStatement stmt = ConexaoBanco.getConnection().prepareStatement(sql)) {
@@ -70,10 +88,14 @@ public class HospedeDAO {
         }
     }
 
+    /**
+     * Lista todos os hospedes disponiveis na data selecionada
+     * @param dataEntrada Data do inicio da procura
+     * @param dataSaida Data do ultimo dia a ser procurado
+     * @return Retonra uma lista de hospedes ou null caso não encontrado nenhum hospede
+     */
     public List<Hospede> listarHospedesDisponiveis(String dataEntrada, String dataSaida) {
         List<Hospede> lista = new ArrayList<>();
-        // SQL complexo para encontrar todos os hóspedes que NÃO estão participando de NENHUMA
-        // reserva (seja como responsável ou como participante adicional) durante o período conflitante.
         String sql = "SELECT * FROM hospedes WHERE cpf NOT IN (" +
                 "  SELECT DISTINCT cpf_hospede FROM (" +
                 "      SELECT cpf_hospede FROM reservas WHERE data_entrada < ? AND data_saida > ? " +

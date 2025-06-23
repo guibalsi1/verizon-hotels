@@ -2,13 +2,13 @@ package view.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.toedter.calendar.JCalendar;
-import control.dao.HospedeDAO; // Mantido para o novo método
-import control.dao.QuartoDAO;   // Mantido para o novo método
+import control.dao.HospedeDAO;
+import control.dao.QuartoDAO;
 import model.Hospede;
 import model.Quarto;
 import model.Reserva;
 import model.exceptions.ReservaInvalidaException;
-import control.facade.ReservaFacade; // Usado para salvar
+import control.facade.ReservaFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,23 +19,20 @@ import java.util.Calendar;
 import java.util.List;
 
 public class AddBookingDialog extends JDialog {
-    // --- Componentes da UI ---
     private JComboBox<Hospede> hospedeComboBox;
     private JComboBox<Quarto> quartoComboBox;
     private JCalendar checkInField;
     private JCalendar checkOutField;
-    private JPanel detailsPanel; // NOVO: Painel para a segunda etapa
-    private JPanel buttonPanelStep2; // NOVO: Painel de botões para a segunda etapa
-    private JButton verificarButton; // NOVO: Botão para a primeira etapa
+    private JPanel detailsPanel;
+    private JPanel buttonPanelStep2;
+    private JButton verificarButton;
 
     private boolean reservaAdicionada = false;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    // DAOs para buscar listas de disponíveis
     private final QuartoDAO quartoDAO = new QuartoDAO();
     private final HospedeDAO hospedeDAO = new HospedeDAO();
 
-    // Renderers para os ComboBoxes (sem alteração)
     private final DefaultListCellRenderer hospedeRenderer = new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -56,7 +53,7 @@ public class AddBookingDialog extends JDialog {
     public AddBookingDialog(Frame owner) {
         super(owner, "Adicionar Nova Reserva", true);
         initComponents();
-        pack(); // Ajusta o tamanho inicial
+        pack();
         setLocationRelativeTo(owner);
         setResizable(false);
     }
@@ -64,7 +61,6 @@ public class AddBookingDialog extends JDialog {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // --- ETAPA 1: SELEÇÃO DE DATAS ---
         JPanel datePanel = new JPanel(new GridBagLayout());
         datePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -82,7 +78,6 @@ public class AddBookingDialog extends JDialog {
         verificarButton.addActionListener(e -> onVerificarDisponibilidade());
         buttonPanelStep1.add(verificarButton);
 
-        // --- ETAPA 2: DETALHES DA RESERVA (INICIALMENTE OCULTO) ---
         detailsPanel = new JPanel(new GridBagLayout());
         detailsPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
         detailsPanel.setVisible(false); // Começa oculto
@@ -108,9 +103,8 @@ public class AddBookingDialog extends JDialog {
         cancelarButton.addActionListener(e -> dispose());
         buttonPanelStep2.add(salvarButton);
         buttonPanelStep2.add(cancelarButton);
-        buttonPanelStep2.setVisible(false); // Começa oculto
+        buttonPanelStep2.setVisible(false);
 
-        // Adiciona os painéis ao diálogo
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(datePanel);
@@ -124,8 +118,6 @@ public class AddBookingDialog extends JDialog {
         add(centerPanel, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
     }
-
-    // --- LÓGICA DE CONTROLE ---
 
     private boolean validarDatas() {
         try {
@@ -147,8 +139,6 @@ public class AddBookingDialog extends JDialog {
 
         String checkIn = coverterData(checkInField.getCalendar());
         String checkOut = coverterData(checkOutField.getCalendar());
-
-        // Busca as listas filtradas usando os novos métodos do DAO
         List<Quarto> quartosDisponiveis = quartoDAO.listarQuartosDisponiveis(checkIn, checkOut);
         List<Hospede> hospedesDisponiveis = hospedeDAO.listarHospedesDisponiveis(checkIn, checkOut);
 
@@ -157,15 +147,13 @@ public class AddBookingDialog extends JDialog {
             return;
         }
 
-        // Popula os ComboBoxes com os dados filtrados
         hospedeComboBox.setModel(new DefaultComboBoxModel<>(hospedesDisponiveis.toArray(new Hospede[0])));
         quartoComboBox.setModel(new DefaultComboBoxModel<>(quartosDisponiveis.toArray(new Quarto[0])));
 
-        // Exibe a segunda etapa da UI
         detailsPanel.setVisible(true);
         buttonPanelStep2.setVisible(true);
-        verificarButton.setVisible(false); // Oculta o botão da primeira etapa
-        pack(); // Reajusta o tamanho do diálogo
+        verificarButton.setVisible(false);
+        pack();
     }
 
     private void salvarReserva() {
